@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: my-pro-kube-prometheus-sta-general.rules
+  namespace: monitoring  # Change to the namespace where Prometheus Operator is running
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+  - name: example
+    rules:
+    - alert: PodCrashLooping
+      expr: kube_pod_container_status_restarts_total{job="kube-state-metrics"} > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod is crash looping"
+        description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted more than 5 times in the last 5 minutes."
